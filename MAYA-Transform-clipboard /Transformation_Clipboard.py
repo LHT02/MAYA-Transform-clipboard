@@ -7,7 +7,7 @@ language = '简体中文'
 # 文本字典，用于支持多语言
 texts = {
     '简体中文': {
-        'title': '变换剪贴板',
+        'title': '剪贴板插件',
         'copy': '复制变换属性',
         'paste': '粘贴变换属性',
         'clear': '清理剪贴板',
@@ -22,7 +22,7 @@ texts = {
         'cleared': '剪贴板已清空'
     },
     '繁體中文': {
-        'title': '變換剪貼板',
+        'title': '剪貼板插件',
         'copy': '複製變換屬性',
         'paste': '粘貼變換屬性',
         'clear': '清理剪貼板',
@@ -37,7 +37,7 @@ texts = {
         'cleared': '剪貼板已清空'
     },
     '日本語': {
-        'title': '変換クリップボード',
+        'title': 'クリップボードプラグイン',
         'copy': '変換属性をコピー',
         'paste': '変換属性を貼り付け',
         'clear': 'クリップボードをクリア',
@@ -52,7 +52,7 @@ texts = {
         'cleared': 'クリップボードがクリアされました'
     },
     'English': {
-        'title': 'Transformation Clipboard',
+        'title': 'Clipboard Plugin',
         'copy': 'Copy Transform Attributes',
         'paste': 'Paste Transform Attributes',
         'clear': 'Clear Clipboard',
@@ -137,19 +137,18 @@ def show_help():
 def switch_language(lang):
     global language
     language = lang
-    cmds.window("clipboardUI", edit=True, title=texts[language]['title'])
+    cmds.workspaceControl('clipboardUIWorkspaceControl', edit=True, label=texts[language]['title'])
     cmds.button('copyBtn', edit=True, label=texts[language]['copy'])
     cmds.button('pasteBtn', edit=True, label=texts[language]['paste'])
     cmds.button('clearBtn', edit=True, label=texts[language]['clear'])
 
 # 创建UI
 def create_ui():
-    if cmds.window("clipboardUI", exists=True):
-        cmds.deleteUI("clipboardUI")
-
+    # 如果已经存在窗口和控制，请删除
     if cmds.workspaceControl('clipboardUIWorkspaceControl', exists=True):
         cmds.deleteUI('clipboardUIWorkspaceControl', control=True)
 
+    # 创建窗口
     window = cmds.window("clipboardUI", title=texts[language]['title'], widthHeight=(500, 300), sizeable=True)
     
     cmds.menuBarLayout()
@@ -183,10 +182,12 @@ def create_ui():
         (clear_btn, 'top', 5, paste_btn),
         (clipboard_list, 'top', 5, clear_btn)
     ])
-    
+
     cmds.showWindow(window)
-    cmds.workspaceControl('clipboardUIWorkspaceControl', label=texts[language]['title'], tabToControl=('MayaWindow', -1), edit=True, retain=True)
-    cmds.control('clipboardUI', edit=True, parent='clipboardUIWorkspaceControl')
+
+    # 创建可吸附的 workspaceControl 并将窗口嵌入其中
+    cmds.workspaceControl('clipboardUIWorkspaceControl', label=texts[language]['title'], tabToControl=('MayaWindow', -1), retain=True)
+    cmds.control(window, edit=True, parent='clipboardUIWorkspaceControl')
 
 # 加载插件时创建UI
 create_ui()
